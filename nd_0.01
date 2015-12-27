@@ -1,0 +1,27 @@
+import paramiko
+import os
+import sys
+
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+ssh.connect('1.1.1.1', port=22, username='admin', password='admin')
+
+channel = ssh.invoke_shell()
+
+channel_data = str()
+host = str()
+srcfile = str()
+
+while True:
+	if channel.recv_ready():
+		channel_data += channel.recv(9999) #9999 max value?
+	else:
+		continue
+	if channel_data.endswith('Cisco#'):
+		channel.send('copy tftp: flash:\n')
+	elif channel_data.endshwith('Source filename []'):
+		srcfile = raw_input(\n\n\tEnter the Source file: ')
+		channel.send(srcfile)
+		channel.send('\n')
+
